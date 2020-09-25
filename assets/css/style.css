@@ -1,0 +1,81 @@
+:root {
+  --maroon: #8b103e;
+  --gray: #aaa;
+}
+
+@font-face {
+  font-family: Verlag-Black;
+  src: url(Verlag-Black.ttf);
+}
+
+.title-text {
+	font-size: 48pt;
+}
+
+.packer-wordmark {
+	color: var(--maroon);
+	font-family: "Verlag-Black";
+}
+
+.bg {
+	/*background-color: #ffaaaa;*/
+	border: solid;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.center-text {
+	text-align: center;
+}
+
+button {
+	color: #fff;
+	border: none;
+	padding: 10px 32px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	border-radius: 8px;
+	background-color: var(--maroon)
+}
+
+.question-text {
+	margin-bottom: 2px;
+}
+
+.timestamp {
+	font-size: 8pt;
+	color: var(--gray);
+}
+
+.feather {
+  width: 16px;
+  height: 16px;
+  stroke: #000;
+}
+
+.feedback-box .feather {
+	margin-right: 5px;
+}
+
+.like.active {
+  color: var(--maroon);
+}
+
+.like.active > .feather {
+	stroke: var(--maroon);
+}
+
+.answer-user {
+	font-weight: bold;
+	padding-right: 5px;
+}
+
+.answer-time {
+	color: var(--gray);
+}
