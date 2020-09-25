@@ -44,6 +44,11 @@ button {
 	background-color: var(--maroon)
 }
 
+button.logout {
+	background-color: var(--gray);
+	float: right;
+}
+
 .question-text {
 	margin-bottom: 2px;
 }

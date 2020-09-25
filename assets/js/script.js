@@ -23,6 +23,7 @@ firebase.auth().onAuthStateChanged(function(u) {
   if (u) {
   	user = u;
   	user.isAdmin = false;
+  	getPosts();
   	firebase.database().ref("adminTest").once("value", function(snapshot){
   		user.isAdmin = true;
   		$('.admin-only').show();
@@ -61,35 +62,37 @@ function ask() {
 	firebase.database().ref("posts/questions").push(post);
 }
 
-firebase.database().ref("posts").on("value", function(snapshot) {
-	let data = snapshot.val();
-	posts = [];
-	if(data == null) data = {};
-	if(data.posts == null) data.posts = {};
-	if(data.likes == null) data.likes = {};
-	if(data.responses == null) data.responses = {};
-	for(i in data.questions) {
-		let question = data.questions[i];
-		if(question.hidden == true) continue;
-		question.id = i;
-		if (data.likes[i] == null) {
-			question.likes = {};
-		} else {
-			question.likes = data.likes[i];
+function getPosts() {
+	firebase.database().ref("posts").on("value", function(snapshot) {
+		let data = snapshot.val();
+		posts = [];
+		if(data == null) data = {};
+		if(data.posts == null) data.posts = {};
+		if(data.likes == null) data.likes = {};
+		if(data.responses == null) data.responses = {};
+		for(i in data.questions) {
+			let question = data.questions[i];
+			if(question.hidden == true) continue;
+			question.id = i;
+			if (data.likes[i] == null) {
+				question.likes = {};
+			} else {
+				question.likes = data.likes[i];
+			}
+			if (data.responses[i] == null) {
+				question.responses = {};
+			} else {
+				question.responses = data.responses[i];
+			}
+			posts.push(question);
 		}
-		if (data.responses[i] == null) {
-			question.responses = {};
-		} else {
-			question.responses = data.responses[i];
-		}
-		posts.push(question);
-	}
-	displayPosts();
-  	setDisplay("main");
-}, function(error) {
-	console.log(error);
-  	setDisplay("login");
-});
+		displayPosts();
+	  	setDisplay("main");
+	}, function(error) {
+		// console.log(error);
+	  	setDisplay("login");
+	});
+}
 
 function displayPosts() {
 	$("#postDiv").empty();
