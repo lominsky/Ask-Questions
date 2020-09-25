@@ -112,6 +112,7 @@ function displayPosts() {
 	filteredPosts = filteredPosts.filter(post => (Object.keys(post.responses).length == 0 && filter.unanswered || Object.keys(post.responses).length > 0 && filter.answered));
 	filteredPosts = filteredPosts.filter(post => post.question.toLowerCase().includes(filter.search))
 	filteredPosts = posts.filter(post => (post.isOwner && filter.isOwner || !post.isOwner && filter.notOwner));
+
 	//Sort
 	filteredPosts.sort(function(a, b) {
 		if(filter.sortCategory == "likeCount") {
@@ -171,13 +172,12 @@ function displayPosts() {
 		$("#postDiv").append(card);
 	}
 	if(filteredPosts.length == 0) {
-		$("#postDiv").append($("<h3></h3>").text("There are no posts that match your filter criteria."));
+		$("#postDiv").append("<div><h3>Sorry, there are no questions that match your filter criteria.</h3></div>");
 	}
 	feather.replace()
 }
 
 function respond(e) {
-	// console.log(e);
 	let div = e.target.parentElement;
 	let box = div.parentElement.parentElement
 
@@ -192,7 +192,6 @@ function respond(e) {
 		user: user.displayName,
 		timestamp: (new Date()).getTime()
 	})
-	// console.log(postId, response);
 }
 
 function toggleLike(e) {
