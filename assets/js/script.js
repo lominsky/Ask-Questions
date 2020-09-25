@@ -100,7 +100,7 @@ function displayPosts() {
 		let post = posts[i];
 		let timestamp = new Date(post.timestamp);
 
-		let card = $("<div></div>").addClass("card mb-2").attr("postId", post.id).attr("timestamp", post.timestamp);
+		let card = $("<div></div>").addClass("card mb-2").attr("id", post.id).attr("timestamp", post.timestamp);
 		
 		let cardBody = $("<div></div>").addClass("card-body");
 		let question = $("<p></p>").addClass("card-text question-text").text(post.question);
@@ -153,7 +153,7 @@ function respond(e) {
 	let div = e.target.parentElement;
 	let box = div.parentElement.parentElement
 
-	let postId = $(box).attr("postId");
+	let postId = $(box).attr("id");
 	let response = $(div).find("textarea").val()
 
 	if(response.length < 2) return false;
@@ -170,7 +170,7 @@ function respond(e) {
 function toggleLike(e) {
 	let span = e.target
 	let box = span.parentElement.parentElement.parentElement.parentElement;
-	let postId = $(box).attr('postId');
+	let postId = $(box).attr('id');
 	let timestamp = $(box).attr('timestamp');
 	let hash = getHash(timestamp);
 	let ref = firebase.database().ref("posts/likes/" + postId + "/" + hash);
