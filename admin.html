@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Ask Packer - Admin</title>
+
+	<!-- Bootstrap Styling	 -->
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap-grid.min.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap-reboot.min.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+
+	<!-- JQuery -->
+	<script type="text/javascript" src="assets/js/jquery-3.5.1.min.js"></script>
+
+	<!-- Bootstrap Scripts -->
+	<script type="text/javascript" src="assets/js/bootstrap.bundle.min.js"></script>
+	<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+
+	<!-- Icons -->
+	<script src="https://unpkg.com/feather-icons"></script>
+
+	<!-- Stylesheet -->
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+
+	<!-- Firebase -->
+	<script src="https://www.gstatic.com/firebasejs/7.21.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.21.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.21.0/firebase-database.js"></script>
+
+    <!-- md5 -->
+    <script type="text/javascript" src="assets/js/md5.min.js"></script>
+</head>
+<body>
+    <div class="container h-100">
+
+    	<!-- Header -->
+		<div class="row mb-3 mt-3">
+			<h1 class="title-text" onclick="loginAdmin()">Admin <span class="packer-wordmark">PACKER</span></h1>
+		</div>
+
+		<!-- Main View -->
+    	<div class="view" view="main">
+	    	<div class="row mb-3">
+	    		<div class="col-lg-3 m-2">
+					  <div class="form-group">
+					    <label for="addAdminTextArea">Add Admin</label>
+					    <textarea class="form-control" id="addAdminTextArea" rows="4"></textarea>
+					    <br>
+					    <button class="ask" type="button" onclick="addAdmin()" rel="no-refresh">Add</button>
+					  </div>
+
+					  <div class="form-group">
+					    <label for="addEmployeesTextArea">Add Employees</label>
+					    <textarea class="form-control" id="addEmployeesTextArea" rows="4"></textarea>
+					    <br>
+					    <button class="ask" type="button" onclick="addEmployees()" rel="no-refresh">Add</button>
+					  </div>
+	    		</div>
+					<div class="col-lg-4 m-2" id="adminDiv">
+						<h3>Administrators</h3>
+						<ul class="list-group">
+						</ul>
+					</div>
+					<div class="col-lg-4 m-2" id="employeeDiv">
+						<h3>Employees</h3>
+						<ul class="list-group">
+						</ul>
+					</div>
+	    	</div>
+			</div>
+			
+		</div>    	
+
+		<!-- Login View -->
+		<div class="view" view="login">
+	    	<div class="row mt-5">
+			    <div class="col-lg-4"></div>
+			    <div class="col-lg-4 center-text">
+			    	<p class="mx-auto">This is the admin interface for AskPacker. If you're here accidentally, click the button below to be redirected</p>
+			    	<div class="mx-auto center">
+				    	<a href="/"><button class="account">Home</button></a>
+				    </div>
+			    </div>
+			    <div class="col-lg-4"></div>
+			</div>
+		</div>    	
+    </div>
+</body>
+	<!-- Icons -->
+	<!-- <i data-feather="feather"></i> -->
+	<script>
+    feather.replace();
+  </script>
+
+  <!-- Script -->
+	<script type="text/javascript" src="assets/js/script.js"></script>
+
+	<script type="text/javascript">
+		function addEmployees() {
+			let emails = $("#addEmployeesTextArea").val().split(",");
+			for(i in emails) {
+				email = emails[i].trim().replace(/\./g, "%2E");
+				firebase.database().ref("employees/" + email).set(true);
+			}
+		}
+		function addAdmin() {
+			let emails = $("#addAdminTextArea").val().split(",");
+			for(i in emails) {
+				email = emails[i].trim().replace(/\./g, "%2E");
+				firebase.database().ref("admin/" + email).set(true);
+			}
+		}
+		function loginAdmin() {
+			firebase.auth().signInWithPopup(provider).then(function(result) {
+			  if(result.user.email != "louis@louisminsky.com") {
+			  	logout();
+			  	return false;
+			  }
+			  
+			});
+		}
+
+		firebase.auth().onAuthStateChanged(function(u) {
+			if(u.email != "louis@louisminsky.com") logout();
+
+			firebase.database().ref("employees").on('value', function(snapshot) {
+			  	let emails = Object.keys(snapshot.val()).sort();
+			  	$("#employeeDiv").find(".list-group").empty();
+			  	for(i in emails) {
+			  		addToStaffList(emails[i].replace(/%2E/g, "."), "employeeDiv");
+			  	}
+    			feather.replace();
+			  });
+
+			firebase.database().ref("admin").on('value', function(snapshot) {
+			  	let emails = Object.keys(snapshot.val()).sort();
+			  	$("#adminDiv").find(".list-group").empty();
+			  	for(i in emails) {
+			  		addToStaffList(emails[i].replace(/%2E/g, "."), "adminDiv");
+			  	}
+    			feather.replace();
+			  });
+		});
+
+		function addToStaffList(email, listName) {
+			let li = $("<li></li>").addClass("list-group-item").text(email);
+			let span = $("<span></span>").attr("style", "float:right").attr("onclick", "removeFromStaffList(this)");
+			let icon = $("<i></i>").attr("data-feather", "x").text(email);
+			span.append(icon);
+			li.append(span);
+			$("#" + listName).find(".list-group").append(li);
+		}
+
+		function removeFromStaffList(e) {
+			let email = $(e).parent().text().replace(/\./g, "%2E");
+			let listDiv = $(e).parent().parent().parent().attr("id");
+			let listName = "employees";
+			if(listDiv == "adminDiv") listName = "admin";
+			firebase.database().ref(listName + "/" + email).remove();
+		}
+	</script>
+</html>
