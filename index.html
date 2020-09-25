@@ -50,6 +50,15 @@
 						<button class="logout" type="button" onclick="logoutAccount()" rel="no-refresh">Logout</button>
 					</div>			
 					<br>		
+					<!-- Search bar -->
+					<div class="row mt-3">
+						<div class="input-group mb-1">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text">Search</span>
+						  </div>
+						  <input type="text" class="form-control" id="searchBar" onkeyup="search()" placeholder="">
+						</div>
+					</div>
 					<!-- Filter Box -->
 					<div class="row">
 						<!-- Left Column -->
@@ -80,6 +89,18 @@
 								    Unanswered Questions
 								  </label>
 								</div>
+								<div class="form-check">
+								  <input class="form-check-input" type="checkbox" checked="true" id="myQuestionsCheck">
+								  <label class="form-check-label" for="myQuestionsCheck">
+								    My Questions
+								  </label>
+								</div>
+								<div class="form-check">
+								  <input class="form-check-input" type="checkbox" checked="true" id="othersQuestionsCheck">
+								  <label class="form-check-label" for="othersQuestionsCheck">
+								    Others' Questions
+								  </label>
+								</div>
 							</form>
 						</div>
 
@@ -96,7 +117,7 @@
 									<input class="form-check-input" type="radio" name="sortCategory" id="inlineRadio2" value="likes">
 									<label class="form-check-label" for="inlineRadio2">Likes</label>
 								</div>
-								<br>
+								<br><br>
 								Sort Directrion<br>
 								<div class="form-check form-check-inline">
 									<input class="form-check-input" type="radio" name="sortDirection" id="inlineRadio3" value="up">
@@ -107,15 +128,6 @@
 									<label class="form-check-label" for="inlineRadio4"><i data-feather="arrow-down"></i></label>
 								</div>
 							</form>
-						</div>
-					</div>
-					<!-- Search bar -->
-					<div class="row mt-3">
-						<div class="input-group mb-1">
-						  <div class="input-group-prepend">
-						    <span class="input-group-text">Search</span>
-						  </div>
-						  <input type="text" class="form-control" id="searchBar" onkeyup="search()" placeholder="">
 						</div>
 					</div>
 	    		</div>

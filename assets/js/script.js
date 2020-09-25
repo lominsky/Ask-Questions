@@ -85,7 +85,7 @@ function getPosts() {
 				question.responses = data.responses[i];
 			}
 
-			//Check if the user liked the question
+			//Check if the user liked the question or if it's their question
 			let hash = getHash(question.timestamp);
 			question.isLiked = false;
 			for(i in question.likes) {
@@ -93,6 +93,7 @@ function getPosts() {
 					question.isLiked = true;
 				}
 			}
+			question.isOwner = question.user == hash;
 			posts.push(question);
 		}
 		displayPosts();
@@ -110,6 +111,7 @@ function displayPosts() {
 	let filteredPosts = posts.filter(post => (post.isLiked && filter.liked || !post.isLiked && filter.unliked));
 	filteredPosts = filteredPosts.filter(post => (Object.keys(post.responses).length == 0 && filter.unanswered || Object.keys(post.responses).length > 0 && filter.answered));
 	filteredPosts = filteredPosts.filter(post => post.question.toLowerCase().includes(filter.search))
+	filteredPosts = posts.filter(post => (post.isOwner && filter.isOwner || !post.isOwner && filter.notOwner));
 	//Sort
 	filteredPosts.sort(function(a, b) {
 		if(filter.sortCategory == "likeCount") {
@@ -214,6 +216,8 @@ let filter = {
 	unliked: true,
 	answered: true,
 	unanswered: true,
+	isOwner: true,
+	notOwner: true,
 	sortCategory: "timestamp",
 	descending: true,
 	search: ""
@@ -224,6 +228,8 @@ function updateFilters() {
 	filter.unliked = filters[1].checked;
 	filter.answered = filters[2].checked;
 	filter.unanswered = filters[3].checked;
+	filter.isOwner = filters[4].checked;
+	filter.notOwner = filters[5].checked;
 
 	let sorts = $("#sorts").find('input');
 	if(sorts[0].checked) filter.sortCategory = "timestamp";
