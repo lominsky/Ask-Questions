@@ -78,4 +78,6 @@ button {
 
 .answer-time {
 	color: var(--gray);
+	font-size: 8pt;
+	padding-bottom: 5px;
 }

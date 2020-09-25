@@ -117,20 +117,21 @@ function displayPosts() {
 		let responses = $("<div></div>").addClass("mt-3");
 		for(i in post.responses) {
 			let resp = post.responses[i];
-			console.log(resp)
+			// console.log(resp)
 			let div = $("<div></div>").addClass("mb-1")
-			let answerer = $("<span></span>").addClass("answer-user").text(resp.user);
-			let time = $("<span></span>").addClass("answer-time").text("(" + (new Date(resp.timestamp)).toLocaleString() + ")");
-			let answer = $("<span></span>").addClass("answer-text").text(resp.answer);
-			div.append(answerer, time, $("<br>"), answer);
+			let answerer = $("<div></div>").addClass("answer-user").text(resp.user);
+			let time = $("<div></div>").addClass("answer-time").text((new Date(resp.timestamp)).toLocaleString());
+			let answer = $("<div></div>").addClass("answer-text").text(resp.answer);
+			div.append(answerer, answer, time);
 			responses.append(div);
 		}
 		if($(responses).html != "") cardBody.append(responses);
 
 		let response = $("<div></div>").addClass("response-box admin-only").hide();
+		if(user.isAdmin) response.show();
 		let inputGroup = $("<div></div>").addClass("input-group mt-3 mb-3");
 		let textarea = $("<textarea></textarea>").addClass("form-control").attr("rows", "4");
-		let br = $("<br>");
+		// let br = $("<br>");
 		let button = $("<button></button>").addClass("respond").attr("type", "button").attr("rel", "no-refresh").text("Answer").click(respond);
 		inputGroup.append(textarea);
 		response.append(inputGroup, button);
@@ -145,7 +146,7 @@ function displayPosts() {
 }
 
 function respond(e) {
-	console.log(e);
+	// console.log(e);
 	let div = e.target.parentElement;
 	let box = div.parentElement.parentElement
 
@@ -160,7 +161,7 @@ function respond(e) {
 		user: user.displayName,
 		timestamp: (new Date()).getTime()
 	})
-	console.log(postId, response);
+	// console.log(postId, response);
 }
 
 function toggleLike(e) {
