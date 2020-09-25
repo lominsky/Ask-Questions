@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Ask Packer</title>
+	<title>Ask School</title>
 
 	<!-- Bootstrap Styling	 -->
 	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap-grid.min.css">
@@ -30,39 +30,116 @@
     <script type="text/javascript" src="assets/js/md5.min.js"></script>
 </head>
 <body>
-    <div class="container h-100">
-
-    	<!-- Header -->
-		<div class="row mb-3 mt-3">
-			<h1 class="title-text">Ask <span class="packer-wordmark">PACKER</span></h1>
-		</div>
+    <div class="container">
 
 		<!-- Main View -->
-    	<div class="view" view="main">
-	    	<div class="row mb-3">
-	    		<div class="col-lg-4 m-2">
-				  <div class="form-group">
-				    <label for="questionTextArea">Ask a Question</label>
-				    <textarea class="form-control" id="questionTextArea" rows="4"></textarea>
-				    <br>
-				    <button class="ask" type="button" onclick="ask()" rel="no-refresh">Ask</button>
-				    <button class="logout" type="button" onclick="logoutAccount()" rel="no-refresh">Logout</button>
-				  </div>
-	    		</div>
-				<div class="col-lg-7 m-2" id="postDiv">
+    	<div class="view" view="main">   
+    		<div class="h-100 d-inline-block"> 	
+				<!-- Left Column -->
+	    		<div class="col-lg-5 mt-3 d-inline-block">
+					<!-- Header -->
+					<div class="row mb-4">
+						<h1 class="title-text">Ask <span class="packer-wordmark">SCHOOL</span></h1>
+					</div>
+					<!-- Ask Box -->
+					<div class="form-group">
+						<label for="questionTextArea">Ask a Question</label>
+						<textarea class="form-control" id="questionTextArea" rows="4"></textarea>
+						<br>
+						<button class="ask" type="button" onclick="ask()" rel="no-refresh">Ask</button>
+						<button class="logout" type="button" onclick="logoutAccount()" rel="no-refresh">Logout</button>
+					</div>			
+					<br>		
+					<!-- Filter Box -->
+					<div class="row">
+						<!-- Left Column -->
+			    		<div class="col-sm-6 d-inline-block">
+						<p><h4>Filter <i data-feather="filter"></i></h4></p>
+							<form id="filters" onchange="updateFilters()">
+								<div class="form-check">
+								  <input class="form-check-input" type="checkbox" checked="true" id="likedQuestionsCheck">
+								  <label class="form-check-label" for="likedQuestionsCheck">
+								    Liked Questions
+								  </label>
+								</div>
+								<div class="form-check">
+								  <input class="form-check-input" type="checkbox" checked="true" id="notLikedQuestionsCheck">
+								  <label class="form-check-label" for="notLikedQuestionsCheck">
+								    Not Liked Questions
+								  </label>
+								</div>
+								<div class="form-check">
+								  <input class="form-check-input" type="checkbox" checked="true" id="answeredQuestionsCheck">
+								  <label class="form-check-label" for="answeredQuestionsCheck">
+								    Answered Questions
+								  </label>
+								</div>
+								<div class="form-check">
+								  <input class="form-check-input" type="checkbox" checked="true" id="unansweredQuestionsCheck">
+								  <label class="form-check-label" for="unansweredQuestionsCheck">
+								    Unanswered Questions
+								  </label>
+								</div>
+							</form>
+						</div>
 
+						<!-- Right Column -->
+			    		<div class="col-sm-6 d-inline-block">
+							<p><h4>Sort <i data-feather="bar-chart"></i></h4></p>
+							<form id="sorts" onchange="updateFilters()">
+								Sort By...<br>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="sortCategory" id="inlineRadio1" value="timestamp" checked="true">
+									<label class="form-check-label" for="inlineRadio1">Time</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="sortCategory" id="inlineRadio2" value="likes">
+									<label class="form-check-label" for="inlineRadio2">Likes</label>
+								</div>
+								<br>
+								Sort Directrion<br>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="sortDirection" id="inlineRadio3" value="up">
+									<label class="form-check-label" for="inlineRadio3"><i data-feather="arrow-up"></i></label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="sortDirection" id="inlineRadio4" value="down" checked="true">
+									<label class="form-check-label" for="inlineRadio4"><i data-feather="arrow-down"></i></label>
+								</div>
+							</form>
+						</div>
+					</div>
+					<!-- Search bar -->
+					<div class="row mt-3">
+						<div class="input-group mb-1">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text">Search</span>
+						  </div>
+						  <input type="text" class="form-control" id="searchBar" onkeyup="search()" placeholder="">
+						</div>
+					</div>
+	    		</div>
+	    		<!-- Right Column -->
+				<div class="col-lg-7 mt-3 d-inline-block" id="postDiv" style="float:right;">
 				</div>
 			</div>
-			
 		</div>    	
 
 		<!-- Login View -->
 		<div class="view" view="login">
 	    	<div class="row mt-5">
+				<!-- Header -->
+				<div class="row mb-4 bg w-100">
+			    	<div style="margin-left: auto;margin-right: auto;">
+						<h1 class="title-text">Ask <span class="packer-wordmark">SCHOOL</span></h1>
+					</div>
+				</div>
+	    	</div>
+	    	<div class="row mt-5">
 			    <div class="col-lg-4"></div>
 			    <div class="col-lg-4 center-text">
-			    	<p class="mx-auto">This is a tool for Packer's faculty and staff to ask questions that can be answered by the administration.</p>
-			    	<p class="mx-auto">You must log in with your Packer Google account to access it.</p>
+			    	<p class="mx-auto">This is an unofficial tool for Packer's faculty and staff to ask questions that can be answered by the administration.</p>
+			    	<p class="mx-auto">It is only accessible to Packer Employees.</p>
 			    	<br>
 			    	<div class="mx-auto center">
 				    	<button class="account" onclick="login()">Login</button>

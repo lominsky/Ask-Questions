@@ -84,6 +84,15 @@ function getPosts() {
 			} else {
 				question.responses = data.responses[i];
 			}
+
+			//Check if the user liked the question
+			let hash = getHash(question.timestamp);
+			question.isLiked = false;
+			for(i in question.likes) {
+				if(i == hash) {
+					question.isLiked = true;
+				}
+			}
 			posts.push(question);
 		}
 		displayPosts();
@@ -96,8 +105,24 @@ function getPosts() {
 
 function displayPosts() {
 	$("#postDiv").empty();
-	for(i in posts) {
-		let post = posts[i];
+
+	//Filter for likes then responses
+	let filteredPosts = posts.filter(post => (post.isLiked && filter.liked || !post.isLiked && filter.unliked));
+	filteredPosts = filteredPosts.filter(post => (Object.keys(post.responses).length == 0 && filter.unanswered || Object.keys(post.responses).length > 0 && filter.answered));
+	filteredPosts = filteredPosts.filter(post => post.question.toLowerCase().includes(filter.search))
+	//Sort
+	filteredPosts.sort(function(a, b) {
+		if(filter.sortCategory == "likeCount") {
+			a.likeCount = Object.keys(a.likes).length;
+			b.likeCount = Object.keys(b.likes).length;
+		}
+		let descending = 1;
+		if(!filter.descending) descending = -1;
+		return (b[filter.sortCategory] - a[filter.sortCategory]) * descending;
+	});
+
+	for(i in filteredPosts) {
+		let post = filteredPosts[i];
 		let timestamp = new Date(post.timestamp);
 
 		let card = $("<div></div>").addClass("card mb-2").attr("id", post.id).attr("timestamp", post.timestamp);
@@ -111,8 +136,7 @@ function displayPosts() {
 		let likeCount = Object.keys(post.likes).length;
 		let thumbsUp = $("<i></i>").attr("data-feather","thumbs-up");
 		let gq = $("<span></span>").text("Good Question (" + likeCount + ")");
-		let hash = getHash(timestamp.getTime())
-		if(post.likes[hash]) like.addClass("active");
+		if(post.isLiked) like.addClass("active");
 		like.append(thumbsUp, gq);
 		feedback.append(like);
 		cardBody.append(question, ts, feedback);
@@ -120,7 +144,6 @@ function displayPosts() {
 		let responses = $("<div></div>").addClass("mt-3");
 		for(i in post.responses) {
 			let resp = post.responses[i];
-			// console.log(resp)
 			let div = $("<div></div>").addClass("mb-1")
 			let answerer = $("<div></div>").addClass("answer-user").text(resp.user);
 			let time = $("<div></div>").addClass("answer-time").text((new Date(resp.timestamp)).toLocaleString());
@@ -144,6 +167,9 @@ function displayPosts() {
 		cardBody.append(response);
 		card.append(cardBody);
 		$("#postDiv").append(card);
+	}
+	if(filteredPosts.length == 0) {
+		$("#postDiv").append($("<h3></h3>").text("There are no posts that match your filter criteria."));
 	}
 	feather.replace()
 }
@@ -181,6 +207,36 @@ function toggleLike(e) {
 	} else {
 		ref.set((new Date()).getTime());
 	}
+}
+
+let filter = {
+	liked: true,
+	unliked: true,
+	answered: true,
+	unanswered: true,
+	sortCategory: "timestamp",
+	descending: true,
+	search: ""
+}
+function updateFilters() {
+	let filters = $("#filters").find('input');
+	filter.liked = filters[0].checked;
+	filter.unliked = filters[1].checked;
+	filter.answered = filters[2].checked;
+	filter.unanswered = filters[3].checked;
+
+	let sorts = $("#sorts").find('input');
+	if(sorts[0].checked) filter.sortCategory = "timestamp";
+	if(sorts[1].checked) filter.sortCategory = "likeCount";
+	if(sorts[2].checked) filter.descending = false;
+	if(sorts[3].checked) filter.descending = true;
+
+	search();
+}
+
+function search() {
+	filter.search = $("#searchBar").val().toLowerCase();
+	displayPosts();
 }
 
 function getHash(timestamp) {
