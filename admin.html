@@ -112,7 +112,7 @@
 		function loginAdmin() {
 			firebase.auth().signInWithPopup(provider).then(function(result) {
 			  if(result.user.email != "louis@louisminsky.com") {
-			  	logout();
+			  	logoutAccount();
 			  	return false;
 			  }
 			  
@@ -120,7 +120,7 @@
 		}
 
 		firebase.auth().onAuthStateChanged(function(u) {
-			if(u.email != "louis@louisminsky.com") logout();
+			if(u.email != "louis@louisminsky.com") logoutAccount();
 
 			firebase.database().ref("employees").on('value', function(snapshot) {
 			  	let emails = Object.keys(snapshot.val()).sort();
