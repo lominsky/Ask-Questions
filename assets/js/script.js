@@ -92,7 +92,7 @@ function ask() {
 		user: getHash(now)
 	}
 
-	firebase.database().ref("posts/questions").set(post, function(error) {
+	firebase.database().ref("posts/questions").push(post, function(error) {
 		if (error) {
 			error.post = post;
 			log("function ask() - 'posts/questions' push error", error);
