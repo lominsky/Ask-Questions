@@ -303,6 +303,33 @@ function goHome() {
 }
 
 function log(message, data = null) {
+	let browserInfo={
+	    timeOpened:new Date(),
+	    timezone:(new Date()).getTimezoneOffset()/60,
+	    pageon: window.location.pathname,
+	    referrer: document.referrer,
+	    previousSites: history.length,
+	    browserName: navigator.appName,
+	    browserEngine: navigator.product,
+	    browserVersion1a: navigator.appVersion,
+	    browserVersion1b: navigator.userAgent,
+	    browserLanguage: navigator.language,
+	    browserOnline: navigator.onLine,
+	    browserPlatform: navigator.platform,
+	    javaEnabled: navigator.javaEnabled(),
+	    dataCookiesEnabled: navigator.cookieEnabled,
+	    dataCookies1: document.cookie,
+	    dataCookies2: decodeURIComponent(document.cookie.split(";")),
+	    sizeScreenW: screen.width,
+	    sizeScreenH: screen.height,
+	    sizeInW: innerWidth,
+	    sizeInH: innerHeight,
+	    sizeAvailW: screen.availWidth,
+	    sizeAvailH: screen.availHeight,
+	    scrColorDepth: screen.colorDepth,
+	    scrPixelDepth: screen.pixelDepth,
+    };
+
 	let tempUser = "N/A";
 	if(user) {
 		tempUser = {
@@ -315,6 +342,7 @@ function log(message, data = null) {
 		timestamp: (new Date()).getTime(),
 		message: message,
 		data: data,
-		user: tempUser
+		user: tempUser,
+		browser: browserInfo
 	})
 }
