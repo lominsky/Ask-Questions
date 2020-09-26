@@ -39,7 +39,7 @@ firebase.auth().onAuthStateChanged(function(u) {
 
 function login() {
 	firebase.auth().signInWithPopup(provider);
-	log("Login function called.")
+	// log("Login function called.") //This seems to be causing an error
 }
 
 function logoutAccount() {
