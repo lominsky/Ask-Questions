@@ -101,7 +101,7 @@
 			let emails = $("#addEmployeesTextArea").val().split(",");
 			for(i in emails) {
 				email = emails[i].trim().replace(/\./g, "%2E");
-				console.log("Create employee", email)
+				// console.log("Create employee", email)
 				firebase.database().ref("employees/" + email).set(true);
 			}
 		}
@@ -109,7 +109,7 @@
 			let emails = $("#addAdminTextArea").val().split(",");
 			for(i in emails) {
 				email = emails[i].trim().replace(/\./g, "%2E");
-				console.log("Create admin", email)
+				// console.log("Create admin", email)
 				firebase.database().ref("admin/" + email).set(true);
 			}
 		}
@@ -126,7 +126,7 @@
 
 		firebase.auth().onAuthStateChanged(function(u) {
 			if(u == null || u.email != "louis@louisminsky.com") {
-				console.log("error")
+				// console.log("error")
 			} else {
 				setDisplay("main");
 			}
@@ -154,7 +154,7 @@
 			let icon = $("<i></i>").attr("data-feather", "x").text(email);
 			span.append(icon);
 			li.append(span);
-			console.log("Add to list", email, listName);
+			// console.log("Add to list", email, listName);
 			$("#" + listName).find(".list-group").append(li);
 		}
 
@@ -163,7 +163,7 @@
 			let listDiv = $(e).parent().parent().parent().attr("id");
 			let listName = "employees";
 			if(listDiv == "adminDiv") listName = "admin";
-			console.log("Remove from list", email, listName);
+			// console.log("Remove from list", email, listName);
 			firebase.database().ref(listName + "/" + email).remove();
 		}
 	</script>
