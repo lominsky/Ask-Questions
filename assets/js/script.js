@@ -16,6 +16,7 @@ provider.setCustomParameters({
 });
 var user = null;
 var posts = [];
+let query = getQuery();
 $(".view").hide();
 
 
@@ -124,6 +125,13 @@ function displayPosts() {
 		return (b[filter.sortCategory] - a[filter.sortCategory]) * descending;
 	});
 
+	if(query.id != null) {
+		filteredPosts = posts.filter(post => post.id == query.id);
+		$('.form-group').hide();
+		$('.searchBar').hide();
+		$('.filterBox').hide();
+	}
+
 	for(i in filteredPosts) {
 		let post = filteredPosts[i];
 		let timestamp = new Date(post.timestamp);
@@ -134,15 +142,27 @@ function displayPosts() {
 		let question = $("<p></p>").addClass("card-text question-text").text(post.question);
 		let ts = $("<p></p>").addClass("card-text timestamp").text("Asked " + timestamp.toLocaleDateString() + " at " + timestamp.toLocaleTimeString());
 		
-		let feedback = $("<div></div>").addClass("feedback-box");
+		let feedback = $("<div style='display: inline-block'></div>").addClass("feedback-box");
 		let like = $("<span></span>").addClass("like").click(toggleLike);
 		let likeCount = Object.keys(post.likes).length;
 		let thumbsUp = $("<i></i>").attr("data-feather","thumbs-up");
 		let gq = $("<span></span>").text("Good Question (" + likeCount + ")");
 		if(post.isLiked) like.addClass("active");
 		like.append(thumbsUp, gq);
-		feedback.append(like);
-		cardBody.append(question, ts, feedback);
+
+		let share = $("<div style='display:inline-block;float:right;'></div>").click(function() {
+			let link = location.origin + "?id=" + post.id;
+			console.log(link);
+			navigator.clipboard.writeText(link);
+		});
+		let link = $("<i></i>").attr("data-feather","link");
+		share.append(link, " Copy Link")
+
+		feedback.append(like, share);
+
+		
+
+		cardBody.append(question, ts, feedback, share);
 
 		let responses = $("<div></div>").addClass("mt-3");
 		for(i in post.responses) {
@@ -174,7 +194,7 @@ function displayPosts() {
 	if(filteredPosts.length == 0) {
 		$("#postDiv").append("<div><h3>Sorry, there are no questions that match your filter criteria.</h3></div>");
 	}
-	feather.replace()
+	feather.replace();
 }
 
 function respond(e) {
@@ -244,6 +264,24 @@ function search() {
 	displayPosts();
 }
 
+function getQuery() {
+	let s = window.location.search;
+	if(s.length > 0) s = s.substring(1);
+	s = s.split("&")
+	let temp = {};
+	for(i in s) {
+		s[i] = s[i].split("=");
+		if(s[i].length != 2) continue;
+		temp[s[i][0]] = s[i][1];
+	}
+	console.log(temp);
+	return temp;
+}
+
 function getHash(timestamp) {
 	return md5(user.uid + timestamp);
+}
+
+function goHome() {
+	window.location.href = window.location.origin;
 }
