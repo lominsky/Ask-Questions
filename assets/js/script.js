@@ -152,7 +152,7 @@ function displayPosts() {
 
 		let share = $("<div style='display:inline-block;float:right;'></div>").click(function() {
 			let link = location.origin + "?id=" + post.id;
-			console.log(link);
+			// console.log(link);
 			navigator.clipboard.writeText(link);
 		});
 		let link = $("<i></i>").attr("data-feather","link");
@@ -274,7 +274,7 @@ function getQuery() {
 		if(s[i].length != 2) continue;
 		temp[s[i][0]] = s[i][1];
 	}
-	console.log(temp);
+	// console.log(temp);
 	return temp;
 }
 
