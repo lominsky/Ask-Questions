@@ -260,7 +260,12 @@
 				let card = $("<div></div>").addClass("card mb-2");
 			
 				let cardBody = $("<div></div>").addClass("card-body");
-				let logMessage = $("<p></p>").addClass("card-text question-text").text(log.message);
+				let logMessage = $("<p style='font-weight:bold'></p>").addClass("card-text question-text").text(log.message);
+				let logData = "";
+				if(log.data != null) {
+					logData = $("<p></p>").addClass("card-text question-text").text(JSON.stringify(log.data));
+				}
+				
 				let ts = $("<p></p>").addClass("card-text timestamp").text(log.user.name + " on " + timestamp.toLocaleDateString() + " at " + timestamp.toLocaleTimeString());
 				
 				let trash = $("<div style='display: inline-block'></div>").attr("id", log.id).addClass("feedback-box").click(deleteLog);
@@ -270,7 +275,7 @@
 				like.append(trashIcon, trashText);
 				trash.append(like);
 
-				cardBody.append(logMessage, ts, trash);
+				cardBody.append(logMessage, logData, ts, trash);
 				card.append(cardBody);
 				$("#logsDiv").append(card);
 			}

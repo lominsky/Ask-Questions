@@ -19,11 +19,10 @@ var posts = [];
 let query = getQuery();
 $(".view").hide();
 
-
+let isFirstLoad = true;
 firebase.auth().onAuthStateChanged(function(u) {
   if (u) {
   	user = u;
-  	log("onAuthStateChanged - user exists");
   	user.isAdmin = false;
   	getPosts();
   	firebase.database().ref("adminTest").once("value", function(snapshot){
@@ -32,19 +31,40 @@ firebase.auth().onAuthStateChanged(function(u) {
   	});
   } else {
   	user = null;
-  	log("onAuthStateChanged - user null");
   	setDisplay("login");
+  	if(!isFirstLoad)
+  		log("onAuthStateChanged - user null");
   }
+  isFirstLoad = false;
 });
 
 function login() {
-	firebase.auth().signInWithPopup(provider);
+	firebase.auth().signInWithPopup(provider).then(function(u) {
+		log("login - success", u);
+	}).catch(err => {
+		if(err) {
+			console.log(err);
+			log("function login() - error", err);
+		}
+	});;
 	// log("Login function called.") //This seems to be causing an error
 }
 
 function logoutAccount() {
-	firebase.auth().signOut();
-	log("logoutAccount")
+	firebase.auth().signOut().then(function() {
+		log("function logoutAccount() - success");
+		firebase.database().ref("posts").off("value", postListener).catch(err => {
+			if(err) {
+				log("error removing postListener on logout", err);
+			}
+		})
+	}).catch(err => {
+		if(err) {
+			console.log(err);
+			log("function logoutAccount() - error", err);
+		}
+	});
+	
 }
 
 function setDisplay(val) {
@@ -64,15 +84,20 @@ function ask() {
 		timestamp: now,
 		user: getHash(now)
 	}
-	firebase.database().ref("posts/questions").push(post, function(error) {
+
+	firebase.database().ref("posts/questions").set(post, function(error) {
 		if (error) {
-		  log("function ask() - 'posts/questions' push error", error);
+			error.post = post;
+			log("function ask() - 'posts/questions' push error", error);
+		} else {
+			log('function ask() success', post);
 		}
 	});
 }
 
+let postListener;
 function getPosts() {
-	firebase.database().ref("posts").on("value", function(snapshot) {
+	postListener = firebase.database().ref("posts").on("value", function(snapshot) {
 		let data = snapshot.val();
 		posts = [];
 		if(data == null) data = {};
@@ -106,7 +131,9 @@ function getPosts() {
 			posts.push(question);
 		}
 		displayPosts();
-	  	setDisplay("main");
+		if(window.location.pathname != "/admin.html") {
+		  	setDisplay("main");
+		 }
 	}, function(error) {
 		log("function getPosts() 'posts' on value error", error);
 	  	setDisplay("login");
@@ -247,13 +274,16 @@ function respond(e) {
 	if(response.length < 2) return false;
 
 	$(div).find("textarea").val("")
-	firebase.database().ref("posts/responses/" + postId).push({
+	let respObj = {
 		answer: response,
 		user: user.displayName,
 		timestamp: (new Date()).getTime()
-	}, function(error) {
+	};
+	firebase.database().ref("posts/responses/" + postId).push(respObj, function(error) {
 	    if (error) {
-	      log("posts/response/" + postId + " push error", error);
+	    	error.postId = postId;
+	    	error.respObj = respObj;
+	     	log("function respond() push error", error);
 	    } else {
 	    	$(e.target).remove();
 	    }
@@ -268,13 +298,22 @@ function toggleLike(e) {
 	let hash = getHash(timestamp);
 	let ref = firebase.database().ref("posts/likes/" + postId + "/" + hash);
 	let active = $(span.parentElement).hasClass('active');
+	let now = (new Date()).getTime();
 
 	if(active) {
-		ref.remove();
+		ref.remove().catch(error => { 
+			error.now = now;
+			error.postId = postId;
+			error.hash = hash;
+			log("toggleLike remove error", error);
+       });
 	} else {
-		ref.set((new Date()).getTime(), function(error) {
+		ref.set(now, function(error) {
 			if (error) {
-			  log("like set error", error);
+				error.now = now;
+				error.postId = postId;
+				error.hash = hash;
+				log("toggleLike set error", error);
 			}
 		});
 	}
