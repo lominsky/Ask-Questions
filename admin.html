@@ -28,6 +28,8 @@
 
     <!-- md5 -->
     <script type="text/javascript" src="assets/js/md5.min.js"></script>
+
+     <link rel="icon" href="assets/settings.svg">
 </head>
 <body>
     <div class="container h-100">
@@ -99,6 +101,7 @@
 			let emails = $("#addEmployeesTextArea").val().split(",");
 			for(i in emails) {
 				email = emails[i].trim().replace(/\./g, "%2E");
+				console.log("Create employee", email)
 				firebase.database().ref("employees/" + email).set(true);
 			}
 		}
@@ -106,6 +109,7 @@
 			let emails = $("#addAdminTextArea").val().split(",");
 			for(i in emails) {
 				email = emails[i].trim().replace(/\./g, "%2E");
+				console.log("Create admin", email)
 				firebase.database().ref("admin/" + email).set(true);
 			}
 		}
@@ -120,26 +124,24 @@
 		}
 
 		firebase.auth().onAuthStateChanged(function(u) {
-			if(u.email != "louis@louisminsky.com") logoutAccount();
+			if(u == null || u.email != "louis@louisminsky.com") logoutAccount();
 
-			firebase.database().ref("employees").on('value', function(snapshot) {
-			  	let emails = Object.keys(snapshot.val()).sort();
-			  	$("#employeeDiv").find(".list-group").empty();
-			  	for(i in emails) {
-			  		addToStaffList(emails[i].replace(/%2E/g, "."), "employeeDiv");
-			  	}
-    			feather.replace();
-			  });
+			prepListener("employees");
+			prepListener("admin");
 
-			firebase.database().ref("admin").on('value', function(snapshot) {
-			  	let emails = Object.keys(snapshot.val()).sort();
-			  	$("#adminDiv").find(".list-group").empty();
-			  	for(i in emails) {
-			  		addToStaffList(emails[i].replace(/%2E/g, "."), "adminDiv");
-			  	}
-    			feather.replace();
-			  });
 		});
+
+		function prepListener(root) {
+			firebase.database().ref(root).on('value', function(snapshot) {
+				if(snapshot.val() == null) return false;
+			  	let emails = Object.keys(snapshot.val()).sort();
+			  	$("#" + root + "Div").find(".list-group").empty();
+			  	for(i in emails) {
+			  		addToStaffList(emails[i].replace(/%2E/g, "."), root + "Div");
+			  	}
+    			feather.replace();
+			});
+		}
 
 		function addToStaffList(email, listName) {
 			let li = $("<li></li>").addClass("list-group-item").text(email);
@@ -147,6 +149,7 @@
 			let icon = $("<i></i>").attr("data-feather", "x").text(email);
 			span.append(icon);
 			li.append(span);
+			console.log("Add to list", email, listName);
 			$("#" + listName).find(".list-group").append(li);
 		}
 
@@ -155,6 +158,7 @@
 			let listDiv = $(e).parent().parent().parent().attr("id");
 			let listName = "employees";
 			if(listDiv == "adminDiv") listName = "admin";
+			console.log("Remove from list", email, listName);
 			firebase.database().ref(listName + "/" + email).remove();
 		}
 	</script>
