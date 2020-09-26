@@ -64,7 +64,11 @@ function ask() {
 		timestamp: now,
 		user: getHash(now)
 	}
-	firebase.database().ref("posts/questions").push(post);
+	firebase.database().ref("posts/questions").push(post, function(error) {
+		if (error) {
+		  log("posts/questions push error", error);
+		}
+	});
 }
 
 function getPosts() {
@@ -104,7 +108,7 @@ function getPosts() {
 		displayPosts();
 	  	setDisplay("main");
 	}, function(error) {
-		// console.log(error);
+		log("Posts 'on value' read error", error);
 	  	setDisplay("login");
 	});
 }
@@ -215,7 +219,11 @@ function respond(e) {
 		answer: response,
 		user: user.displayName,
 		timestamp: (new Date()).getTime()
-	})
+	}, function(error) {
+	    if (error) {
+	      log("posts/response/" + postId + " push error", error);
+	    }
+	});
 }
 
 function toggleLike(e) {
@@ -230,7 +238,11 @@ function toggleLike(e) {
 	if(active) {
 		ref.remove();
 	} else {
-		ref.set((new Date()).getTime());
+		ref.set((new Date()).getTime(), function(error) {
+			if (error) {
+			  log("like set error", error);
+			}
+		});
 	}
 }
 
@@ -290,10 +302,11 @@ function goHome() {
 	window.location.href = window.location.origin;
 }
 
-function log(message) {
+function log(message, data = null) {
 	firebase.database().ref("log").push({
 		timestamp: (new Date()).getTime(),
 		message: message,
+		data: data,
 		uid: user.uid,
 		name: user.displayName
 	})
