@@ -303,14 +303,12 @@ function goHome() {
 }
 
 function log(message, data = null) {
-	let tempUser = user;
-	if(tempUser.uid == null) tempUser.uid = "N/A";
-	if(tempUser.displayName == null) tempUser.displayName = "N/A";
+	let tempUser = "N/A";
+	if(user) tempUser = user;
 	firebase.database().ref("log").push({
 		timestamp: (new Date()).getTime(),
 		message: message,
 		data: data,
-		uid: user.uid,
-		name: user.displayName
+		user: tempUser
 	})
 }
