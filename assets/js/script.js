@@ -23,6 +23,7 @@ $(".view").hide();
 firebase.auth().onAuthStateChanged(function(u) {
   if (u) {
   	user = u;
+  	log("Auth state changed - logged in: " + u.displayName);
   	user.isAdmin = false;
   	getPosts();
   	firebase.database().ref("adminTest").once("value", function(snapshot){
@@ -31,16 +32,19 @@ firebase.auth().onAuthStateChanged(function(u) {
   	});
   } else {
   	user = null;
+  	log("Auth state changed - no user");
   	setDisplay("login");
   }
 });
 
 function login() {
 	firebase.auth().signInWithPopup(provider);
+	log("Login function called.")
 }
 
 function logoutAccount() {
 	firebase.auth().signOut();
+	log("User logged out.")
 }
 
 function setDisplay(val) {
@@ -284,4 +288,13 @@ function getHash(timestamp) {
 
 function goHome() {
 	window.location.href = window.location.origin;
+}
+
+function log(message) {
+	firebase.database().ref("log").push({
+		timestamp: (new Date()).getTime(),
+		message: message,
+		uid: user.uid,
+		name: user.displayName
+	})
 }
