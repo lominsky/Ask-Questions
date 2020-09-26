@@ -23,7 +23,7 @@ $(".view").hide();
 firebase.auth().onAuthStateChanged(function(u) {
   if (u) {
   	user = u;
-  	log("Auth state changed - logged in: " + u.displayName);
+  	log("onAuthStateChanged - user exists");
   	user.isAdmin = false;
   	getPosts();
   	firebase.database().ref("adminTest").once("value", function(snapshot){
@@ -32,7 +32,7 @@ firebase.auth().onAuthStateChanged(function(u) {
   	});
   } else {
   	user = null;
-  	log("Auth state changed - no user");
+  	log("onAuthStateChanged - user null");
   	setDisplay("login");
   }
 });
@@ -44,7 +44,7 @@ function login() {
 
 function logoutAccount() {
 	firebase.auth().signOut();
-	log("User logged out.")
+	log("logoutAccount")
 }
 
 function setDisplay(val) {
@@ -66,7 +66,7 @@ function ask() {
 	}
 	firebase.database().ref("posts/questions").push(post, function(error) {
 		if (error) {
-		  log("posts/questions push error", error);
+		  log("function ask() - 'posts/questions' push error", error);
 		}
 	});
 }
@@ -108,7 +108,7 @@ function getPosts() {
 		displayPosts();
 	  	setDisplay("main");
 	}, function(error) {
-		log("Posts 'on value' read error", error);
+		log("function getPosts() 'posts' on value error", error);
 	  	setDisplay("login");
 	});
 }
@@ -330,7 +330,11 @@ function log(message, data = null) {
 	    scrPixelDepth: screen.pixelDepth,
     };
 
-	let tempUser = "N/A";
+	let tempUser = {
+		uid: "N/A",
+		name: "N/A",
+		email: "N/A",
+	}
 	if(user) {
 		tempUser = {
 			uid: user.uid,

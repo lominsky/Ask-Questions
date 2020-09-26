@@ -32,45 +32,51 @@
      <link rel="icon" href="assets/settings.svg">
 </head>
 <body>
-    <div class="container h-100">
-
-    	<!-- Header -->
-		<div class="row mb-3 mt-3">
-			<h1 class="title-text" onclick="loginAdmin()">Ask <span class="packer-wordmark">ADMIN</span></h1>
-		</div>
-
+    <div class="container">
 		<!-- Main View -->
     	<div class="view" view="main">
-	    	<div class="row mb-3">
-	    		<div class="col-lg-3 m-2">
-					  <div class="form-group">
-					    <label for="addAdminTextArea">Add Admin</label>
-					    <textarea class="form-control" id="addAdminTextArea" rows="4"></textarea>
-					    <br>
-					    <button class="ask" type="button" onclick="addAdmin()" rel="no-refresh">Add</button>
-					  </div>
+			<!-- Left Column -->
+    		<div class="col-lg-5 d-inline-block">
+    			 <!-- Header -->
+				<div class="row mb-3 mt-3">
+					<h1 class="title-text" onclick="loginAdmin()">Ask <span class="packer-wordmark">ADMIN</span></h1>
+				</div>
 
-					  <div class="form-group">
-					    <label for="addEmployeesTextArea">Add Employees</label>
-					    <textarea class="form-control" id="addEmployeesTextArea" rows="4"></textarea>
-					    <br>
-					    <button class="ask" type="button" onclick="addEmployees()" rel="no-refresh">Add</button>
-					  </div>
-	    		</div>
-					<div class="col-lg-4 m-2" id="adminDiv">
-						<h3>Administrators</h3>
-						<ul class="list-group">
-						</ul>
-					</div>
-					<div class="col-lg-4 m-2" id="employeesDiv">
-						<h3>Employees</h3>
-						<ul class="list-group">
-						</ul>
-					</div>
-	    	</div>
-			</div>
-			
-		</div>    	
+				<div class="row mb-3">
+					<button class="asks" type="button" onclick="setDisplay('logs')" rel="no-refresh">View Logs</button>
+				</div>
+		    	<div class="row mb-3">
+						  <div class="form-group">
+						    <label for="addAdminTextArea">Add Admin</label>
+						    <textarea class="form-control" id="addAdminTextArea" rows="4"></textarea>
+						    <br>
+						    <button class="ask" type="button" onclick="addAdmin()" rel="no-refresh">Add</button>
+						  </div>
+
+						  <div class="form-group">
+						    <label for="addEmployeesTextArea">Add Employees</label>
+						    <textarea class="form-control" id="addEmployeesTextArea" rows="4"></textarea>
+						    <br>
+						    <button class="ask" type="button" onclick="addEmployees()" rel="no-refresh">Add</button>
+						  </div>
+		    	</div>
+		    </div>
+
+			<!-- Right Column -->
+    		<div class="col-lg-6 mt-3 d-inline-block">
+				<div  id="adminDiv">
+					<h3>Administrators</h3>
+					<ul class="list-group" style="display:block">
+					</ul>
+				</div>
+				<br>
+				<div id="employeesDiv">
+					<h3>Employees</h3>
+					<ul class="list-group">
+					</ul>
+				</div>
+    		</div>
+		</div>  	
 
 		<!-- Login View -->
 		<div class="view" view="login">
@@ -84,8 +90,40 @@
 			    </div>
 			    <div class="col-lg-4"></div>
 			</div>
-		</div>    	
-    </div>
+		</div>
+
+		<!-- Log View -->
+		<div class="view" view="logs">   
+			<!-- Left Column -->
+			<div class="col-lg-5 mt-3 d-inline-block">
+				<!-- Header -->
+				<div class="row mb-4" onclick="goHome()">
+					<h1 class="title-text">Ask <span class="packer-wordmark">ADMIN</span></h1>
+				</div>	
+				<button class="asks" type="button" onclick="setDisplay('main')" rel="no-refresh">View Employees</button>
+				<!-- Filter Box -->
+				<div class="row filterLogsBox">
+					<!-- Left Column -->
+		    		<div class="col-sm-12 d-inline-block">
+					<p><h4>Filter <i data-feather="filter"></i></h4></p>
+						<form id="logFilters" onchange="updateLogFilters()">
+							Users
+							<select class="custom-select uniqueUsers" multiple></select>
+							Messages
+							<select class="custom-select uniqueMessages" multiple></select>
+							Browser
+							<select class="custom-select uniqueBrowsers" multiple></select>
+						</form>
+						<br>
+						<button class="asks" type="button" onclick="removeAllLogs()" rel="no-refresh">Remove All</button>
+					</div>
+				</div>
+			</div>
+			<!-- Right Column -->
+			<div class="col-lg-7 mt-3 d-inline-block" id="logsDiv" style="float:right;">
+			</div>
+		</div>
+	</div>    
 </body>
 	<!-- Icons -->
 	<!-- <i data-feather="feather"></i> -->
@@ -126,13 +164,15 @@
 
 		firebase.auth().onAuthStateChanged(function(u) {
 			if(u == null || u.email != "louis@louisminsky.com") {
-				// console.log("error")
+				log("admin onAuthStateChanged unauthorized")
+				return false;
 			} else {
 				setDisplay("main");
 			}
 
 			prepListener("employees");
 			prepListener("admin");
+			prepLogs();
 
 		});
 
@@ -146,6 +186,149 @@
 			  	}
     			feather.replace();
 			});
+		}
+
+		let logData;
+		let unique = {};
+		function prepLogs() {
+			firebase.database().ref("log").on('value', function(snapshot) {
+				logData = snapshot.val();
+				getUniqueValues();
+				updateLogFilters();
+				generateLogs();
+			});
+		}
+
+		function getUniqueValues() {
+			unique.messages = {};
+			unique.users = {};
+			unique.browsers = {};
+			for(i in logData) {
+				unique.messages[logData[i].message] = true;
+				unique.users[logData[i].user.name] = true;
+				unique.browsers[logData[i].browser.browserVersion1a] = true;
+			}
+
+			$(".uniqueUsers").empty();
+			for(i in unique.users) {
+				$(".uniqueUsers").append($('<option>' + i + '</option>'));
+			}
+
+			$(".uniqueMessages").empty();
+			for(i in unique.messages) {
+				$(".uniqueMessages").append($('<option>' + i + '</option>'));
+			}
+
+			$(".uniqueBrowsers").empty();
+			for(i in unique.browsers) {
+				$(".uniqueBrowsers").append($('<option>' + i + '</option>'));
+			}
+		}
+
+		function generateLogs() {
+			let logs = [];
+			for(i in logData) {
+				let temp = logData[i];
+				temp.id = i;
+				logs.push(temp);
+			}
+
+			logs = logs.filter(function (log) {
+				let acceptable = true;
+				//Check name
+				if(acceptable && Object.keys(logFilter.users).length != 0) {
+					acceptable = logFilter.users[log.user.name];
+				}
+				//Check message
+				if(acceptable && Object.keys(logFilter.messages).length != 0) {
+					acceptable = logFilter.messages[log.message];
+				}
+				//Check browser
+				if(acceptable && Object.keys(logFilter.browsers).length != 0) {
+					acceptable = logFilter.browsers[log.browser.browserVersion1a];
+				}
+
+				if(acceptable) return true;
+				return false;
+			})
+
+			$("#logsDiv").empty();
+			for(i in logs) {
+				let log = logs[i];
+				let timestamp = new Date(log.timestamp);
+
+				let card = $("<div></div>").addClass("card mb-2");
+			
+				let cardBody = $("<div></div>").addClass("card-body");
+				let logMessage = $("<p></p>").addClass("card-text question-text").text(log.message);
+				let ts = $("<p></p>").addClass("card-text timestamp").text(log.user.name + " on " + timestamp.toLocaleDateString() + " at " + timestamp.toLocaleTimeString());
+				
+				let trash = $("<div style='display: inline-block'></div>").attr("id", log.id).addClass("feedback-box").click(deleteLog);
+				let like = $("<span></span>").addClass("like");
+				let trashIcon = $("<i></i>").attr("data-feather","trash-2");
+				let trashText = $("<span></span>").text("Delete");
+				like.append(trashIcon, trashText);
+				trash.append(like);
+
+				cardBody.append(logMessage, ts, trash);
+				card.append(cardBody);
+				$("#logsDiv").append(card);
+			}
+			if(log.length == 0) {
+				$("#logsDiv").append("<div><h3>Sorry, there are no logs that match your filter criteria.</h3></div>");
+			}
+			feather.replace();
+		}
+
+		let logFilter = {
+			users: {},
+			messages: {},
+			browsers: {}
+		};
+		function updateLogFilters() {
+			logFilter = {
+				users: {},
+				messages: {},
+				browsers: {}
+			}
+			let selects = $("#logFilters").find("select");
+
+			//Selected Users
+			$(selects[0]).find("option:selected").each(function() {
+				logFilter.users[$(this).text()] = true;
+			})
+
+			//Selected Messages
+			$(selects[1]).find("option:selected").each(function() {
+				logFilter.messages[$(this).text()] = true;
+			})
+
+			//Selected Browsers
+			$(selects[2]).find("option:selected").each(function() {
+				logFilter.browsers[$(this).text()] = true;
+			})
+
+			// console.log(logFilter);
+			generateLogs();
+
+		}
+
+		function removeAllLogs() {
+			// console.log("REMOVE");
+			let ids = [];
+			$(".feedback-box").each(function() {
+				ids.push($(this).attr("id"));
+			});
+			// console.log(ids);
+			for(i in ids) {
+				firebase.database().ref("log/" + ids[i]).remove();
+			}
+		}
+
+		function deleteLog(e) {
+			let logId = $(e.target).closest(".feedback-box").attr("id");
+			firebase.database().ref("log/" + logId).remove();
+			// console.log(logId);
 		}
 
 		function addToStaffList(email, listName) {
