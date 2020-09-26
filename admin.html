@@ -62,7 +62,7 @@
 						<ul class="list-group">
 						</ul>
 					</div>
-					<div class="col-lg-4 m-2" id="employeeDiv">
+					<div class="col-lg-4 m-2" id="employeesDiv">
 						<h3>Employees</h3>
 						<ul class="list-group">
 						</ul>
@@ -119,12 +119,17 @@
 			  	logoutAccount();
 			  	return false;
 			  }
+			  setDisplay("main");
 			  
 			});
 		}
 
 		firebase.auth().onAuthStateChanged(function(u) {
-			if(u == null || u.email != "louis@louisminsky.com") logoutAccount();
+			if(u == null || u.email != "louis@louisminsky.com") {
+				console.log("error")
+			} else {
+				setDisplay("main");
+			}
 
 			prepListener("employees");
 			prepListener("admin");
