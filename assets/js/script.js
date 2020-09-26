@@ -30,41 +30,48 @@ firebase.auth().onAuthStateChanged(function(u) {
   		$('.admin-only').show();
   	});
   } else {
+  	if(!isFirstLoad)
+  		log("onAuthStateChanged - null user", user.displayName);
   	user = null;
   	setDisplay("login");
-  	if(!isFirstLoad)
-  		log("onAuthStateChanged - user null");
   }
   isFirstLoad = false;
 });
 
 function login() {
-	firebase.auth().signInWithPopup(provider).then(function(u) {
-		log("login - success", u);
-	}).catch(err => {
-		if(err) {
-			console.log(err);
-			log("function login() - error", err);
-		}
-	});;
+	firebase.auth().signInWithPopup(provider).then(function(result) {
+
+	}, function(error) {
+	  // The provider's account email, can be used in case of
+	  // auth/account-exists-with-different-credential to fetch the providers
+	  // linked to the email:
+	  var email = error.email;
+	  // The provider's credential:
+	  var credential = error.credential;
+	  // In case of auth/account-exists-with-different-credential error,
+	  // you can fetch the providers using this:
+	  if (error.code === 'auth/account-exists-with-different-credential') {
+	    auth.fetchSignInMethodsForEmail(email).then(function(providers) {
+	      // The returned 'providers' is a list of the available providers
+	      // linked to the email address. Please refer to the guide for a more
+	      // complete explanation on how to recover from this error.
+	    });
+	  }
+	});
+
+	firebase.auth().signInWithPopup(provider).then(result => {
+		log("login - success", {name: result.user.displayName, email: result.user.email, uid: result.user.uid});
+	}, err => {
+		log("function login() - error", err);
+	});
 	// log("Login function called.") //This seems to be causing an error
 }
 
 function logoutAccount() {
 	firebase.auth().signOut().then(function() {
-		log("function logoutAccount() - success");
-		firebase.database().ref("posts").off("value", postListener).catch(err => {
-			if(err) {
-				log("error removing postListener on logout", err);
-			}
-		})
-	}).catch(err => {
-		if(err) {
-			console.log(err);
-			log("function logoutAccount() - error", err);
-		}
-	});
-	
+		log("function logoutAccount() - success", user.displayName);
+		firebase.database().ref("posts").off("value", postListener);
+	});	
 }
 
 function setDisplay(val) {
@@ -418,7 +425,7 @@ function log(message, data = null) {
 	firebase.database().ref("log").push({
 		timestamp: (new Date()).getTime(),
 		message: message,
-		data: data,
+		data: JSON.stringify(data),
 		user: tempUser,
 		browser: browserInfo
 	})
