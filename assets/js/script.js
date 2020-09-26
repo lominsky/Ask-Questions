@@ -186,12 +186,17 @@ function displayPosts() {
 
 		let response = $("<div></div>").addClass("response-box admin-only").hide();
 		if(user.isAdmin) response.show();
-		let inputGroup = $("<div></div>").addClass("input-group mt-3 mb-3");
-		let textarea = $("<textarea></textarea>").addClass("form-control").attr("rows", "4");
+		let inputGroup = $("<div></div>").addClass("input-group mt-3 mb-3").keyup(addButton);
+		let textarea = $("<textarea></textarea>")
+			.addClass("form-control")
+			.attr("rows", "1")
+			.focus(taHasFocus)
+			.blur(taLostFocus);
 		// let br = $("<br>");
-		let button = $("<button></button>").addClass("respond").attr("type", "button").attr("rel", "no-refresh").text("Answer").click(respond);
+		// let button = $("<button></button>").addClass("respond").attr("type", "button").attr("rel", "no-refresh").text("Answer").click(respond);
 		inputGroup.append(textarea);
-		response.append(inputGroup, button);
+		// response.append(inputGroup, button);
+		response.append(inputGroup);
 
 		
 
@@ -203,6 +208,33 @@ function displayPosts() {
 		$("#postDiv").append("<div><h3>Sorry, there are no questions that match your filter criteria.</h3></div>");
 	}
 	feather.replace();
+}
+
+function taHasFocus(e) {
+	let target = e.target
+	if(target == null) target = e;
+	$(target).attr("rows", "4");
+}
+
+function taLostFocus(e) {
+	let target = e.target
+	if(target == null) target = e;
+	let ta = $(target);
+	if(ta.val().length == 0) {
+		ta.attr("rows", "1")
+	}
+}
+
+function addButton(e) {
+	let buttons = $(e.target.parentElement).siblings("button");
+	// console.log(buttonCount);
+	if(e.target.value.length == 0) {
+		buttons.remove();
+		return false;
+	}
+	if(buttons.length > 0) return false
+	let button = $("<button></button>").addClass("respond").attr("type", "button").attr("rel", "no-refresh").text("Answer as " + user.displayName).click(respond);
+	$(e.target).closest(".response-box").append(button);
 }
 
 function respond(e) {
@@ -222,6 +254,8 @@ function respond(e) {
 	}, function(error) {
 	    if (error) {
 	      log("posts/response/" + postId + " push error", error);
+	    } else {
+	    	$(e.target).remove();
 	    }
 	});
 }

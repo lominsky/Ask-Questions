@@ -46,7 +46,7 @@
 					<!-- Ask Box -->
 					<div class="form-group">
 						<label for="questionTextArea">Ask a Question</label>
-						<textarea class="form-control" id="questionTextArea" rows="4"></textarea>
+						<textarea class="form-control" id="questionTextArea" rows="1" onfocus="taHasFocus(this)" onblur="taLostFocus(this)"></textarea>
 						<br>
 						<button class="ask" type="button" onclick="ask()" rel="no-refresh">Ask</button>
 						<button class="logout" type="button" onclick="logoutAccount()" rel="no-refresh">Logout</button>
