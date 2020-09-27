@@ -31,7 +31,7 @@ firebase.auth().onAuthStateChanged(function(u) {
   	});
   } else {
   	if(!isFirstLoad)
-  		log("onAuthStateChanged - null user", user.displayName);
+  		//log("onAuthStateChanged - null user", user.displayName);
   	user = null;
   	setDisplay("login");
   }
@@ -60,7 +60,7 @@ function login() {
 	});
 
 	firebase.auth().signInWithPopup(provider).then(result => {
-		log("login - success", {name: result.user.displayName, email: result.user.email, uid: result.user.uid});
+		// log("login - success", {name: result.user.displayName, email: result.user.email, uid: result.user.uid});
 	}, err => {
 		log("function login() - error", err);
 	});
@@ -69,7 +69,7 @@ function login() {
 
 function logoutAccount() {
 	firebase.auth().signOut().then(function() {
-		log("function logoutAccount() - success", user.displayName);
+		// log("function logoutAccount() - success", user.displayName);
 		firebase.database().ref("posts").off("value", postListener);
 	});	
 }
@@ -97,7 +97,7 @@ function ask() {
 			error.post = post;
 			log("function ask() - 'posts/questions' push error", error);
 		} else {
-			log('function ask() success', post);
+			// log('function ask() success', post);
 			getPosts();
 		}
 	});
