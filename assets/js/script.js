@@ -98,13 +98,14 @@ function ask() {
 			log("function ask() - 'posts/questions' push error", error);
 		} else {
 			log('function ask() success', post);
+			getPosts();
 		}
 	});
 }
 
 let postListener;
 function getPosts() {
-	postListener = firebase.database().ref("posts").on("value", function(snapshot) {
+	postListener = firebase.database().ref("posts").once("value", function(snapshot) {
 		let data = snapshot.val();
 		posts = [];
 		if(data == null) data = {};
@@ -194,7 +195,6 @@ function displayPosts() {
 
 		let share = $("<div style='display:inline-block;float:right;'></div>").click(function() {
 			let link = location.origin + "?id=" + post.id;
-			// console.log(link);
 			navigator.clipboard.writeText(link);
 		});
 		let link = $("<i></i>").attr("data-feather","link");
@@ -261,7 +261,6 @@ function taLostFocus(e) {
 
 function addButton(e) {
 	let buttons = $(e.target.parentElement).siblings("button");
-	// console.log(buttonCount);
 	if(e.target.value.length == 0) {
 		buttons.remove();
 		return false;
@@ -286,6 +285,14 @@ function respond(e) {
 		user: user.displayName,
 		timestamp: (new Date()).getTime()
 	};
+
+
+	for(i in posts) {
+		if(posts[i].id == postId) {
+			posts[i].responses[Math.random()] = respObj;
+		}
+	}
+
 	firebase.database().ref("posts/responses/" + postId).push(respObj, function(error) {
 	    if (error) {
 	    	error.postId = postId;
@@ -293,6 +300,7 @@ function respond(e) {
 	     	log("function respond() push error", error);
 	    } else {
 	    	$(e.target).remove();
+	    	displayPosts();
 	    }
 	});
 }
@@ -307,23 +315,33 @@ function toggleLike(e) {
 	let active = $(span.parentElement).hasClass('active');
 	let now = (new Date()).getTime();
 
+
+	for(i in posts) {
+		if(posts[i].id == postId) {
+			posts[i].isLiked = !posts[i].isLiked;
+			posts[i].isLiked ? posts[i].likes[hash] = now : delete posts[i].likes[hash];
+		}
+	}
+
+
 	if(active) {
 		ref.remove().catch(error => { 
 			error.now = now;
 			error.postId = postId;
 			error.hash = hash;
-			log("toggleLike remove error", error);
+			log("function toggleLike() remove error", error);
        });
 	} else {
-		ref.set(now, function(error) {
+		ref.set(now, error => {
 			if (error) {
 				error.now = now;
 				error.postId = postId;
 				error.hash = hash;
-				log("toggleLike set error", error);
+				log("function toggleLike() set error", error);
 			}
 		});
 	}
+	displayPosts();
 }
 
 let filter = {
@@ -370,7 +388,6 @@ function getQuery() {
 		if(s[i].length != 2) continue;
 		temp[s[i][0]] = s[i][1];
 	}
-	// console.log(temp);
 	return temp;
 }
 
