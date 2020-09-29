@@ -45,9 +45,12 @@
 					</div>
 					<!-- Ask Box -->
 					<div class="form-group">
-						<label for="questionTextArea">Ask a Question</label>
+						<label for="questionTextArea" style="width:100%">Ask a Question 
+							<span style="float:right"><input id="anonBox" type="checkbox" checked="true">&nbsp;Anonymously</span>
+						</label>
 						<textarea class="form-control" id="questionTextArea" rows="1" onfocus="taHasFocus(this)" onblur="taLostFocus(this)"></textarea>
 						<br>
+
 						<button class="ask" type="button" onclick="ask()" rel="no-refresh">Ask</button>
 						<button class="logout" type="button" onclick="logoutAccount()" rel="no-refresh">Logout</button>
 					</div>			

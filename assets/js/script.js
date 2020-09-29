@@ -85,11 +85,18 @@ function ask() {
 	if(question.length < 3) return false;
 	field.val("");
 
+
 	let now = (new Date()).getTime();
 	let post = {
 		question: question,
 		timestamp: now,
 		user: getHash(now)
+	}
+
+	let stayAnon = $("#anonBox").is(':checked');
+	console.log(stayAnon)
+	if(!stayAnon) {
+		post.userName = user.displayName;
 	}
 
 	firebase.database().ref("posts/questions").push(post, function(error) {
@@ -182,6 +189,7 @@ function displayPosts() {
 		let card = $("<div></div>").addClass("card mb-2").attr("id", post.id).attr("timestamp", post.timestamp);
 		
 		let cardBody = $("<div></div>").addClass("card-body");
+		let asker = $("<div></div>").addClass("answer-user").text(post.userName + " asks:");
 		let question = $("<p></p>").addClass("card-text question-text").text(post.question);
 		let ts = $("<p></p>").addClass("card-text timestamp").text("Asked " + timestamp.toLocaleDateString() + " at " + timestamp.toLocaleTimeString());
 		
@@ -203,7 +211,9 @@ function displayPosts() {
 		feedback.append(like, share);
 
 		
-
+		if(post.userName) {
+			cardBody.append(asker);
+		}
 		cardBody.append(question, ts, feedback, share);
 
 		let responses = $("<div></div>").addClass("mt-3");
