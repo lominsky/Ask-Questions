@@ -215,7 +215,8 @@ function displayPosts() {
 		if(post.userName) {
 			cardBody.append(asker);
 		}
-		cardBody.append(question, ts, feedback, share);
+		// cardBody.append(question, ts, feedback, share);
+		cardBody.append(question, ts, feedback);
 
 		let responses = $("<div></div>").addClass("mt-3");
 		for(i in post.responses) {
