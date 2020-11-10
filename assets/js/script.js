@@ -208,7 +208,8 @@ function displayPosts() {
 		// let link = $("<i></i>").attr("data-feather","link");
 		// share.append(link, " Copy Link")
 
-		feedback.append(like, share);
+		// feedback.append(like, share);
+		feedback.append(like);
 
 		
 		if(post.userName) {
