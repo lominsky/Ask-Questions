@@ -201,12 +201,12 @@ function displayPosts() {
 		if(post.isLiked) like.addClass("active");
 		like.append(thumbsUp, gq);
 
-		let share = $("<div style='display:inline-block;float:right;'></div>").click(function() {
-			let link = location.origin + "?id=" + post.id;
-			navigator.clipboard.writeText(link);
-		});
-		let link = $("<i></i>").attr("data-feather","link");
-		share.append(link, " Copy Link")
+		// let share = $("<div style='display:inline-block;float:right;'></div>").click(function() {
+		// 	let link = location.origin + "?id=" + post.id;
+		// 	navigator.clipboard.writeText(link);
+		// });
+		// let link = $("<i></i>").attr("data-feather","link");
+		// share.append(link, " Copy Link")
 
 		feedback.append(like, share);
 
